@@ -183,7 +183,7 @@ int main( int argc, char *argv[] )
 	int row = 0;
 
 	if ( argc < 3 ) {
-		printf( "usage %s file-name.srt -10000\n", argv[0] );
+		printf( "usage %s file-name.srt [+/-]milli-seconds\n", argv[0] );
 		return 0;
 	}
 
