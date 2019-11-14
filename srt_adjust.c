@@ -1,6 +1,7 @@
-#include <stdio.h>
+#include <unistd.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdio.h>
 
 #define is_digital(c)			(c>='0'&&c<='9')
 
@@ -182,6 +183,8 @@ int main( int argc, char *argv[] )
 	int delta = 0;
 	int row = 0;
 
+	int save = 1;
+
 	if ( argc < 3 ) {
 		printf( "usage %s file-name.srt [+/-]milli-seconds\n", argv[0] );
 		return 0;
@@ -218,6 +221,7 @@ int main( int argc, char *argv[] )
 		if ( strstr(line, "-->") ) {
 			//printf( "%s\n", line );
 			if ( move(line, delta) == -1 ) {
+				save = 0;
 				printf( "parse time failed[%d]:%s\n", row, line);
 				break;
 			}
@@ -226,6 +230,7 @@ int main( int argc, char *argv[] )
 
 		//printf( "---%s\n", line );
 		if ( fputs(line, fnew) == EOF ) {
+			save = 0;
 			printf( "Writing failed[%d]:%s\n", row, line);
 			break;
 		}
@@ -235,6 +240,20 @@ int main( int argc, char *argv[] )
 
 	fclose( f );
 	fclose( fnew );
+
+	if ( save ) {
+		// remove old
+		save = unlink(fname);
+		// rename fnew
+		if ( save ) {
+			perror( "unlink failed" );
+		} else  {
+			save = rename( fname_new, fname );
+			if ( save ) {
+				perror( "rename failed" );
+			}
+		}
+	}
 
 	return 0;
 }
